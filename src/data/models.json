@@ -1,5 +1,5 @@
 {
-  "_readme": "SINGLE SOURCE OF TRUTH for the model landscape. Consumed by (a) the paper 'Using AI Safely and Ethically in Research', Section 2, and (b) the llm-guide web tool, Model landscape section. Update here only, then run shared/sync-models.sh to push into the app. This is the fix for the two artefacts drifting apart.",
+  "_readme": "SINGLE SOURCE OF TRUTH for the model landscape. Consumed by (a) the paper 'Using AI Safely and Ethically in Research', Section 2, and (b) the llm-guide web tool, Model landscape section. Update here only, then run shared/sync-models.sh. This is the fix for the two artefacts drifting apart.",
   "as_of": "2026-07-20",
   "maintainer": "Barry Johnston, Atlantic Technological University",
 
@@ -7,91 +7,125 @@
     "name": "Artificial Analysis Intelligence Index",
     "url": "https://artificialanalysis.ai/evaluations/artificial-analysis-intelligence-index",
     "methodology": "https://artificialanalysis.ai/methodology/intelligence-benchmarking",
-    "open_models_view": "https://artificialanalysis.ai/models/open-source"
+    "leaderboard": "https://artificialanalysis.ai/leaderboards/models",
+    "open_models_view": "https://artificialanalysis.ai/models/open-source",
+    "index_version": "v4.1",
+    "index_components": ["GDPval-AA v2", "tau3-Banking", "Terminal-Bench v2.1", "SciCode", "Humanity's Last Exam", "GPQA Diamond", "CritPt", "AA-Omniscience", "AA-LCR"],
+    "retrieved": "2026-07-20",
+    "retrieved_directly": true
   },
 
-  "verification_note": "Entries with \"verify\": true were drawn from secondary reporting and MUST be checked against the primary source before publication or before minting a DOI. aaIndex = Artificial Analysis Intelligence Index (0-100 composite). The index was revised to v4.1 during 2026, so scores are NOT comparable across index versions. null means we have no sourced figure - do not substitute a guess.",
+  "verification_note": "All aaIndex figures below were read directly from the Artificial Analysis leaderboard on 2026-07-20, not from secondary reporting. Index version v4.1; scores are NOT comparable across index versions. 150 models ranked, of which 84 are open weights.",
 
-  "benchmark_policy": "The previous version of the web tool displayed hardcoded MMLU / HumanEval / MATH figures. Those are not reproduced here because no verified current figures were available for the 2026 model set. Showing a single sourced composite with an explicit as-of date is more defensible than three unsourced numbers.",
+  "important_caveat_scores_are_per_configuration": "Artificial Analysis scores a model CONFIGURATION, not a model. The same model scores differently at different reasoning-effort settings — e.g. GPT-5.6 Sol scores 59 (max), 58 (xhigh), 56 (high), 54 (medium), 49 (low) and 41 (non-reasoning). Always state the configuration alongside a score. The configuration is given in each entry's name field.",
+
+  "benchmark_policy": "Earlier versions of the web tool displayed hardcoded MMLU / HumanEval / MATH figures with no source. These were removed rather than carried forward. A single sourced composite with an explicit as-of date and configuration is more defensible than three unsourced numbers.",
 
   "caveats": [
-    "Composite 'intelligence' scores aggregate very different underlying tasks - always cite the methodology alongside a score.",
-    "Rankings changed materially within a single month during drafting. Every number here is perishable.",
-    "Context windows and parameter counts are vendor-stated where given; several vendors do not disclose.",
-    "'Open weight' is not 'open source': weights and a licence are published, but often not training data or code. Licences vary per model and must be checked individually."
+    "Composite 'intelligence' scores aggregate very different underlying tasks - cite the methodology alongside any score.",
+    "Rankings changed materially within a single month during drafting. Every figure here is perishable.",
+    "'Open weight' is not 'open source': weights and a licence are published, but often not training data or code. Licences vary per model and must be checked individually.",
+    "Openness is a spectrum, not a binary: NVIDIA's Nemotron 3 Ultra appears in open-model comparisons but its weights are listed as not available. Artificial Analysis maintains a separate Openness Index."
   ],
 
   "models": [
-    { "id": "claude-fable-5", "name": "Claude Fable 5", "provider": "Anthropic", "scale": "frontier", "open": false, "colorKey": "coral",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": 60,
-      "strengths": "Top of the Artificial Analysis Intelligence Index at time of writing; reasoning and coding", "verify": true },
+    { "id": "claude-fable-5", "name": "Claude Fable 5 (with fallback)", "provider": "Anthropic", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 60, "priceBlendedUsdPerMTok": 7.70,
+      "strengths": "Ranked #1 of 150 models on the Artificial Analysis Intelligence Index", "verify": false },
 
-    { "id": "gpt-5-6", "name": "GPT-5.6", "provider": "OpenAI", "scale": "frontier", "open": false, "colorKey": "coral",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": 58.9,
-      "strengths": "Broad general capability; most widely deployed, via ChatGPT", "verify": true },
+    { "id": "gpt-5-6-sol", "name": "GPT-5.6 Sol (max)", "provider": "OpenAI", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 59, "priceBlendedUsdPerMTok": 4.35,
+      "strengths": "Ranked #2; broad general capability, most widely deployed via ChatGPT", "verify": false },
 
-    { "id": "kimi-k3", "name": "Kimi K3", "provider": "Moonshot AI", "scale": "frontier", "open": true, "colorKey": "teal",
-      "params": "2.8T MoE", "ctx": "undisclosed", "aaIndex": 57.1,
-      "strengths": "Among the top few models of any kind; agentic coding",
-      "note": "Released 16 July 2026; weights reportedly not published until 27 July 2026 - confirm before describing as open-weight.", "verify": true },
+    { "id": "kimi-k3", "name": "Kimi K3", "provider": "Moonshot AI (Kimi)", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1.05M", "aaIndex": 57, "priceBlendedUsdPerMTok": 2.31,
+      "strengths": "Ranked #4 overall - the highest-scoring model from a lab that usually publishes weights",
+      "note": "NOT currently classified as open weights by Artificial Analysis: it does not appear in their open-models comparison, and their top open-weight list is GLM-5.2, MiniMax-M3, DeepSeek V4 Pro. Do not describe K3 as open-weight without checking whether weights have since been released.",
+      "verify": false },
 
-    { "id": "claude-opus-4-8", "name": "Claude Opus 4.8", "provider": "Anthropic", "scale": "frontier", "open": false, "colorKey": "coral",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": 56,
-      "strengths": "Reasoning, safety, long-context analysis", "verify": true },
+    { "id": "claude-opus-4-8", "name": "Claude Opus 4.8 (max)", "provider": "Anthropic", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 56, "priceBlendedUsdPerMTok": 3.85,
+      "strengths": "Reasoning, safety, long-context analysis", "verify": false },
 
-    { "id": "gpt-5-5", "name": "GPT-5.5", "provider": "OpenAI", "scale": "frontier", "open": false, "colorKey": "coral",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": 55,
-      "strengths": "Still widely deployed; strong default for writing and knowledge work", "verify": true },
+    { "id": "gpt-5-5", "name": "GPT-5.5 (xhigh)", "provider": "OpenAI", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "922k", "aaIndex": 55, "priceBlendedUsdPerMTok": 4.35,
+      "strengths": "Still widely deployed; strong default for writing and knowledge work", "verify": false },
 
-    { "id": "glm-5-2", "name": "GLM-5.2", "provider": "Z.ai / Zhipu AI", "scale": "frontier", "open": true, "colorKey": "teal",
-      "params": "744B MoE", "ctx": "undisclosed", "aaIndex": null,
-      "strengths": "Reported strongest open-weight model overall; reasoning and code", "verify": true },
+    { "id": "grok-4-5", "name": "Grok 4.5 (high)", "provider": "xAI", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "500k", "aaIndex": 54, "priceBlendedUsdPerMTok": 1.35,
+      "strengths": "Integrated with the X platform",
+      "note": "Artificial Analysis lists the creator as 'SpaceXAI'.", "verify": false },
 
-    { "id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro", "provider": "DeepSeek", "scale": "frontier", "open": true, "colorKey": "teal",
-      "params": "MoE", "ctx": "undisclosed", "aaIndex": null,
-      "strengths": "MoE efficiency, strong reasoning and code", "verify": true },
+    { "id": "claude-sonnet-5", "name": "Claude Sonnet 5 (max)", "provider": "Anthropic", "scale": "mid", "open": false, "colorKey": "purple",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 53, "priceBlendedUsdPerMTok": 1.54,
+      "strengths": "Strong cost-performance balance; coding", "verify": false },
+
+    { "id": "glm-5-2", "name": "GLM-5.2 (max)", "provider": "Z AI (Zhipu)", "scale": "frontier", "open": true, "colorKey": "teal",
+      "params": "753B total, 40B active (MoE)", "ctx": "1M", "aaIndex": 51, "priceBlendedUsdPerMTok": 0.90,
+      "strengths": "Highest-scoring open-weight model on the leaderboard", "verify": false },
+
+    { "id": "gemini-3-5-flash", "name": "Gemini 3.5 Flash", "provider": "Google DeepMind", "scale": "mid", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 50, "priceBlendedUsdPerMTok": 1.31,
+      "strengths": "Strong price-performance; scores above Gemini 3.1 Pro on this index", "verify": false },
+
+    { "id": "gemini-3-1-pro", "name": "Gemini 3.1 Pro Preview", "provider": "Google DeepMind", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 46, "priceBlendedUsdPerMTok": 1.74,
+      "strengths": "Long context, multimodal, deep Workspace integration", "verify": false },
+
+    { "id": "qwen3-7-max", "name": "Qwen3.7 Max", "provider": "Alibaba", "scale": "frontier", "open": false, "colorKey": "coral",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 46, "priceBlendedUsdPerMTok": 1.43,
+      "strengths": "Alibaba's top-scoring model; multilingual",
+      "note": "Does not appear in the open-models comparison - treat as proprietary unless confirmed otherwise.", "verify": false },
 
     { "id": "minimax-m3", "name": "MiniMax-M3", "provider": "MiniMax", "scale": "frontier", "open": true, "colorKey": "teal",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": null,
-      "strengths": "Among the highest-intelligence open-weight models", "verify": true },
+      "params": "428B total, 23B active (MoE)", "ctx": "1M", "aaIndex": 44, "priceBlendedUsdPerMTok": 0.20,
+      "strengths": "Joint second-highest open-weight model; very low price", "verify": false },
 
-    { "id": "gemini-3-pro", "name": "Gemini 3.x Pro", "provider": "Google DeepMind", "scale": "frontier", "open": false, "colorKey": "coral",
-      "params": "undisclosed", "ctx": "very large (1M+ on recent Gemini releases)", "aaIndex": null,
-      "strengths": "Long context, multimodal, deep Workspace integration",
-      "note": "Exact current point release not confirmed.", "verify": true },
+    { "id": "deepseek-v4-pro", "name": "DeepSeek V4 Pro (Reasoning, Max Effort)", "provider": "DeepSeek", "scale": "frontier", "open": true, "colorKey": "teal",
+      "params": "1.6T total, 49B active (MoE)", "ctx": "1M", "aaIndex": 44, "priceBlendedUsdPerMTok": 0.20,
+      "strengths": "Joint second-highest open-weight model; MoE efficiency, reasoning and code", "verify": false },
 
-    { "id": "grok-4-5", "name": "Grok 4.5", "provider": "xAI", "scale": "frontier", "open": false, "colorKey": "coral",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": null,
-      "strengths": "Integrated with the X platform", "verify": true },
+    { "id": "kimi-k2-6", "name": "Kimi K2.6", "provider": "Moonshot AI (Kimi)", "scale": "frontier", "open": true, "colorKey": "teal",
+      "params": "1T total, 32B active (MoE)", "ctx": "256k", "aaIndex": 44, "priceBlendedUsdPerMTok": 0.70,
+      "strengths": "Open-weight; agentic coding", "verify": false },
 
-    { "id": "claude-sonnet-5", "name": "Claude Sonnet 5", "provider": "Anthropic", "scale": "mid", "open": false, "colorKey": "purple",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": null,
-      "strengths": "Strong cost-performance balance; coding", "verify": true },
+    { "id": "mimo-v2-5-pro", "name": "MiMo-V2.5-Pro", "provider": "Xiaomi", "scale": "frontier", "open": true, "colorKey": "teal",
+      "params": "1.0T total, 42B active (MoE)", "ctx": "1M", "aaIndex": 42, "priceBlendedUsdPerMTok": 0.20,
+      "strengths": "Large open-weight MoE at very low price", "verify": false },
 
-    { "id": "qwen3-max", "name": "Qwen3.7 Max", "provider": "Alibaba", "scale": "mid", "open": true, "colorKey": "blue",
-      "params": "undisclosed", "ctx": "long-context variants available", "aaIndex": null,
-      "strengths": "Multilingual, strong general capability; permissive licence on prior Qwen3 releases", "verify": true },
+    { "id": "deepseek-v4-flash", "name": "DeepSeek V4 Flash (max)", "provider": "DeepSeek", "scale": "mid", "open": true, "colorKey": "blue",
+      "params": "284B total, 13B active (MoE)", "ctx": "1M", "aaIndex": 40, "priceBlendedUsdPerMTok": 0.06,
+      "strengths": "Cheapest capable open-weight option in this set", "verify": false },
 
-    { "id": "llama-4", "name": "Llama 4", "provider": "Meta", "scale": "mid", "open": true, "colorKey": "blue",
-      "params": "405B+ (MoE variants)", "ctx": "very long-context variants", "aaIndex": null,
-      "strengths": "Widely supported ecosystem; strong multilingual",
-      "note": "Llama Community Licence is not OSI-approved.", "verify": true },
+    { "id": "nemotron-3-ultra", "name": "Nemotron 3 Ultra 550B A55B (Reasoning)", "provider": "NVIDIA", "scale": "mid", "open": false, "colorKey": "purple",
+      "params": "550B total, 55B active (MoE)", "ctx": "262k", "aaIndex": 38, "priceBlendedUsdPerMTok": 0.58,
+      "strengths": "Appears in open-model comparisons",
+      "note": "Weights listed as 'Not available' despite appearing on the open-models page - a good illustration that openness is a spectrum.", "verify": false },
 
-    { "id": "mistral-large", "name": "Mistral Large", "provider": "Mistral", "scale": "mid", "open": true, "colorKey": "blue",
-      "params": "~123B", "ctx": "128K", "aaIndex": null,
-      "strengths": "Multilingual, function calling, European provenance", "verify": true },
+    { "id": "qwen3-5-397b", "name": "Qwen3.5 397B A17B (Reasoning)", "provider": "Alibaba", "scale": "mid", "open": true, "colorKey": "blue",
+      "params": "397B total, 17B active (MoE)", "ctx": "262k", "aaIndex": 34, "priceBlendedUsdPerMTok": 0.90,
+      "strengths": "Alibaba's leading open-weight release; multilingual", "verify": false },
 
-    { "id": "gemma-3", "name": "Gemma 3", "provider": "Google", "scale": "small", "open": true, "colorKey": "accent",
-      "params": "4B / 12B", "ctx": "128K", "aaIndex": null,
-      "strengths": "Runs on modest hardware - a practical option for keeping sensitive data local", "verify": true },
+    { "id": "mistral-medium-3-5", "name": "Mistral Medium 3.5", "provider": "Mistral", "scale": "mid", "open": true, "colorKey": "blue",
+      "params": "128B (dense)", "ctx": "256k", "aaIndex": 30, "priceBlendedUsdPerMTok": 1.16,
+      "strengths": "European provenance; dense model, simpler to self-host than MoE", "verify": false },
 
-    { "id": "phi-4-mini", "name": "Phi-4-mini", "provider": "Microsoft", "scale": "small", "open": true, "colorKey": "accent",
-      "params": "3.8B", "ctx": "16K", "aaIndex": null,
-      "strengths": "Laptop-capable, strong for its size, STEM-oriented", "verify": true },
+    { "id": "claude-haiku-4-5", "name": "Claude 4.5 Haiku", "provider": "Anthropic", "scale": "small", "open": false, "colorKey": "pink",
+      "params": "undisclosed", "ctx": "200k", "aaIndex": 30, "priceBlendedUsdPerMTok": 0.77,
+      "strengths": "Fastest Claude tier; low latency, cost-efficient", "verify": false },
 
-    { "id": "claude-haiku-4-5", "name": "Claude Haiku 4.5", "provider": "Anthropic", "scale": "small", "open": false, "colorKey": "pink",
-      "params": "undisclosed", "ctx": "undisclosed", "aaIndex": null,
-      "strengths": "Fastest Claude tier; low latency, cost-efficient", "verify": true }
+    { "id": "gemma-4-31b", "name": "Gemma 4 31B (Reasoning)", "provider": "Google", "scale": "small", "open": true, "colorKey": "accent",
+      "params": "30.7B (dense)", "ctx": "256k", "aaIndex": 29, "priceBlendedUsdPerMTok": 0.00,
+      "strengths": "Runs on modest hardware - a practical route to keeping sensitive data local", "verify": false },
+
+    { "id": "gpt-oss-120b", "name": "gpt-oss-120b (high)", "provider": "OpenAI", "scale": "small", "open": true, "colorKey": "accent",
+      "params": "117B total, 5.1B active (MoE)", "ctx": "131k", "aaIndex": 24, "priceBlendedUsdPerMTok": 0.20,
+      "strengths": "OpenAI's open-weight release - a frontier lab publishing weights", "verify": false },
+
+    { "id": "llama-4-maverick", "name": "Llama 4 Maverick", "provider": "Meta", "scale": "small", "open": true, "colorKey": "accent",
+      "params": "undisclosed", "ctx": "1M", "aaIndex": 14, "priceBlendedUsdPerMTok": 0.34,
+      "strengths": "Widely supported ecosystem, but now well down the rankings",
+      "note": "Llama 4 Scout supports a 10M context window - the largest on the leaderboard - but scores 10. Meta's highest scorer is now Muse Spark 1.1 (51).", "verify": false }
   ],
 
   "embedding_models": {
@@ -102,8 +136,12 @@
   },
 
   "structural_points": [
-    "The gap between the best open-weight and best proprietary models has narrowed to a few points on composite benchmarks.",
-    "Chinese labs (Moonshot, DeepSeek, Z.ai/Zhipu, Alibaba, MiniMax) hold most top open-weight positions - relevant to procurement, provenance and data-governance decisions.",
-    "Local open-weight models are the practical route to using AI on confidential or personal data without it leaving your institution."
+    "A real gap remains between the best proprietary and best open-weight models: 60 (Claude Fable 5) against 51 (GLM-5.2) on the Intelligence Index - about nine points on a 100-point scale, where the top 20 models span roughly 60 to 46.",
+    "Open weights are nonetheless the majority of the field: 84 of the 150 ranked models are open weights.",
+    "The distinction is no longer 'frontier labs keep weights closed': OpenAI publishes gpt-oss-120b, and Google publishes the Gemma family.",
+    "Chinese labs (Z AI/Zhipu, MiniMax, DeepSeek, Moonshot/Kimi, Xiaomi, Alibaba) occupy most of the leading open-weight positions - relevant to procurement, provenance and data-governance decisions.",
+    "Open-weight models are markedly cheaper: GLM-5.2 at $0.90 per million tokens against $7.70 for the top proprietary model.",
+    "Local open-weight models remain the practical route to using AI on confidential or personal data without it leaving your institution - and a 30B model such as Gemma 4 31B runs on modest hardware.",
+    "Context windows have converged: 1M tokens is now common across frontier models."
   ]
 }
