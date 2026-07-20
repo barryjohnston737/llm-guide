@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+title: "LLM Taxonomy Guide: an interactive reference for large language models"
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+authors:
+  - given-names: Barry
+    family-names: Johnston
+    affiliation: Atlantic Technological University
+    email: barry.johnston@atu.ie
+    orcid: "https://orcid.org/0000-0002-5287-2287"  
+repository-code: "https://github.com/barryjohnston737/llm-guide"
+url: "https://llm-guide-uil6.vercel.app/"
+abstract: >-
+  An interactive web reference covering transformer architectures, tokenisation,
+  context windows, attention, model categories, embeddings and retrieval,
+  alignment and fine-tuning, retrieval-augmented generation, and the practical
+  model landscape. Includes interactive diagrams, a knowledge quiz and a
+  searchable glossary. Designed as a companion to the guidance paper
+  "Using AI Safely and Ethically in Research", which covers the governance and
+  responsible-use dimension that this tool deliberately does not.
+keywords:
+  - large language models
+  - machine learning education
+  - transformers
+  - embeddings
+  - retrieval-augmented generation
+  - interactive learning
+license: MIT          # <-- change if you prefer Apache-2.0; must match the LICENSE file in the repo
+version: 1.0.0
+date-released: 2026-07-20
+identifiers:
+  - type: url
+    value: "https://llm-guide-uil6.vercel.app/"
+    description: Live deployment (convenience mirror; not a persistent identifier)
+references:
+  - type: report
+    title: "Using AI Safely and Ethically in Research: A Practical Guide to the Large Language Model Landscape for Research Colleagues"
+    authors:
+      - given-names: Barry
+        family-names: Johnston
+        affiliation: Atlantic Technological University
+    year: 2026
+    # doi: 10.5281/zenodo.XXXXXXX   # <-- add the paper's Zenodo DOI once minted

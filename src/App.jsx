@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo, createContext, useContext, useCallback } from "react";
+// Single source of truth for the model landscape, shared with the companion paper
+// "Using AI Safely and Ethically in Research". Edit shared/models.json, then run
+// shared/sync-models.sh — never edit this copy directly.
+import MODEL_DATA from "./data/models.json";
 
 class ErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false, error: null }; }
@@ -25,6 +29,7 @@ const SECTIONS = [
   { id: "alignment", label: "Alignment & Tuning" },
   { id: "rag", label: "RAG" },
   { id: "landscape", label: "Landscape" },
+  { id: "safe-use", label: "Safe use" },
   { id: "quiz", label: "Quiz" },
   { id: "glossary", label: "Glossary" },
 ];
@@ -57,9 +62,9 @@ const QUIZ_QUESTIONS = [
   { q: "What is the key advantage of LoRA over full fine-tuning?", options: ["It always improves accuracy more", "It trains only a tiny fraction of parameters (~0.01–1%)", "It requires no training data", "It replaces the base model weights entirely"], correct: 1, explanation: "LoRA freezes the base model and injects two small trainable matrices per layer. Instead of updating all billions of parameters, you train only ~0.01–1% of them — dramatically reducing GPU memory and training time." },
   { q: "Which retrieval approach passes query and document TOGETHER through a single model in one forward pass?", options: ["Bi-encoder", "Late interaction (ColBERT)", "Cross-encoder", "BM25 sparse retrieval"], correct: 2, explanation: "Cross-encoders concatenate the query and document and process them jointly, enabling deep cross-attention between every token pair. This gives the highest accuracy but cannot precompute document vectors offline." },
   { q: "In RLHF, what is the reward model primarily trained on?", options: ["Next-token prediction on web text", "Human preference rankings between response pairs", "Automated fact-checking labels", "Constitutional AI principles"], correct: 1, explanation: "The reward model is trained on human preference data — annotators rank which of two responses is better. The LLM is then optimised via PPO to maximise scores from this learned reward signal." },
-  { q: "Which of these is NOT a decoder-only autoregressive model?", options: ["GPT-4", "Claude 3", "Llama 4", "BERT"], correct: 3, explanation: "BERT is an encoder-only model using bidirectional attention — built for understanding, not generation. GPT-4, Claude 3, and Llama 4 are all autoregressive decoder-only models that generate text left-to-right." },
+  { q: "Which of these is NOT a decoder-only autoregressive model?", options: ["GPT-5", "Claude", "Llama 4", "BERT"], correct: 3, explanation: "BERT is an encoder-only model using bidirectional attention — built for understanding, not generation. The GPT, Claude and Llama families are all autoregressive decoder-only models that generate text left-to-right." },
   { q: "What does 'hallucination' mean in the context of LLMs?", options: ["The model produces very slow outputs", "The model generates fluent but factually incorrect content", "The model visualises attention weights", "The model refuses to answer sensitive questions"], correct: 1, explanation: "Hallucination is when a model generates confident, fluent-sounding text that is factually wrong or completely fabricated. It's a core challenge for deploying LLMs in factual, high-stakes applications." },
-  { q: "What is the primary advantage of Mixture-of-Experts (MoE) models?", options: ["Fewer total parameters than dense models", "Lower accuracy but faster first-token latency", "Massive total capacity with lower per-token compute cost", "They eliminate the need for pre-training"], correct: 2, explanation: "MoE models have many expert sub-networks but only activate a subset per token. This gives enormous total capacity (e.g. 685B params in DeepSeek-V3) while keeping per-token FLOPs manageable." },
+  { q: "What is the primary advantage of Mixture-of-Experts (MoE) models?", options: ["Fewer total parameters than dense models", "Lower accuracy but faster first-token latency", "Massive total capacity with lower per-token compute cost", "They eliminate the need for pre-training"], correct: 2, explanation: "MoE models have many expert sub-networks but only activate a subset per token. Recent MoE releases reach from hundreds of billions into trillions of total parameters, while keeping per-token FLOPs manageable." },
   { q: "What self-supervised objective is used in LLM pretraining?", options: ["Binary classification (harmful / not harmful)", "Next-token prediction on massive text corpora", "Human preference ranking", "Image-text contrastive learning"], correct: 1, explanation: "Most LLMs are pretrained using causal language modelling: next-token prediction on trillions of tokens. This self-supervised objective requires no labels and builds broad world knowledge and language understanding." },
 ];
 
@@ -1263,19 +1268,10 @@ function ModelCards() {
   const { C } = useTheme();
   const [filter, setFilter] = useState("all");
   const [showBenchmarks, setShowBenchmarks] = useState(false);
-  const models = [
-    { name: "Claude Opus 4", provider: "Anthropic", scale: "frontier", open: false, color: C.coral, params: "Undisclosed", ctx: "200K", strengths: "Reasoning, safety, long-context analysis", mmlu: 88.2, humaneval: 84.9, math: 89.5 },
-    { name: "GPT-4o", provider: "OpenAI", scale: "frontier", open: false, color: C.coral, params: "Undisclosed", ctx: "128K", strengths: "Multimodal, broad capability, vision", mmlu: 88.7, humaneval: 90.2, math: 76.6 },
-    { name: "Gemini Ultra", provider: "Google", scale: "frontier", open: false, color: C.coral, params: "Undisclosed", ctx: "1M+", strengths: "Massive context window, multimodal", mmlu: 90.0, humaneval: 74.4, math: 53.2 },
-    { name: "Llama 4", provider: "Meta", scale: "frontier", open: true, color: C.teal, params: "405B+", ctx: "128K", strengths: "Open-weight, strong multilingual, MoE variants", mmlu: 85.5, humaneval: 86.0, math: 79.0 },
-    { name: "DeepSeek-V3", provider: "DeepSeek", scale: "frontier", open: true, color: C.teal, params: "685B MoE", ctx: "128K", strengths: "MoE efficiency, strong reasoning, code", mmlu: 88.5, humaneval: 82.6, math: 87.7 },
-    { name: "Claude Sonnet 4", provider: "Anthropic", scale: "mid", open: false, color: C.purple, params: "Undisclosed", ctx: "200K", strengths: "Best cost-performance ratio, coding", mmlu: 79.0, humaneval: 73.0, math: 71.1 },
-    { name: "Mistral Large", provider: "Mistral", scale: "mid", open: true, color: C.blue, params: "~123B", ctx: "128K", strengths: "Multilingual, function calling, European", mmlu: 81.2, humaneval: 45.1, math: 45.0 },
-    { name: "Qwen3-72B", provider: "Alibaba", scale: "mid", open: true, color: C.blue, params: "72B", ctx: "128K", strengths: "Strong reasoning, multilingual, MoE variants", mmlu: 87.0, humaneval: 86.0, math: 80.0 },
-    { name: "Phi-4-mini", provider: "Microsoft", scale: "small", open: true, color: C.accent, params: "3.8B", ctx: "16K", strengths: "Runs on laptop, strong for size, STEM", mmlu: 70.0, humaneval: 72.0, math: 73.0 },
-    { name: "Gemma 3", provider: "Google", scale: "small", open: true, color: C.accent, params: "4B/12B", ctx: "128K", strengths: "Mobile-ready, efficient, multimodal", mmlu: 72.0, humaneval: 57.0, math: 51.0 },
-    { name: "Claude Haiku 4", provider: "Anthropic", scale: "small", open: false, color: C.pink, params: "Undisclosed", ctx: "200K", strengths: "Fastest Claude, low latency, cost-efficient", mmlu: 75.2, humaneval: 75.9, math: 70.7 },
-  ];
+  // Model data comes from src/data/models.json, which is a copy of shared/models.json —
+  // the single source of truth shared with the companion paper. Edit that file, then run
+  // shared/sync-models.sh. Do not hardcode model data here again.
+  const models = MODEL_DATA.models.map(m => ({ ...m, color: C[m.colorKey] || C.accent }));
   const filtered = filter === "all" ? models : models.filter(m => m.scale === filter);
   const filters = [{ id: "all", label: "All" }, { id: "frontier", label: "Frontier" }, { id: "mid", label: "Mid-range" }, { id: "small", label: "Small / edge" }];
   return (
@@ -1285,6 +1281,17 @@ function ModelCards() {
         <button onClick={() => setShowBenchmarks(b => !b)} style={{ marginLeft: "auto", background: showBenchmarks ? C.blue + "20" : C.surface, border: `1px solid ${showBenchmarks ? C.blue : C.border}`, color: showBenchmarks ? C.blue : C.textMuted, borderRadius: 20, padding: "6px 18px", cursor: "pointer", fontSize: 14, fontWeight: showBenchmarks ? 700 : 500, transition: "all .2s", fontFamily: "inherit" }}>
           {showBenchmarks ? "Hide benchmarks" : "Show benchmarks"}
         </button>
+      </div>
+      <div style={{ fontSize: 12, color: C.textDim, marginBottom: 16, lineHeight: 1.6 }}>
+        Snapshot as of <strong style={{ color: C.textMuted }}>{MODEL_DATA.as_of}</strong> · scores from the{" "}
+        <a href={MODEL_DATA.primary_source.url} target="_blank" rel="noopener noreferrer" style={{ color: C.accent }}>
+          {MODEL_DATA.primary_source.name}
+        </a>{" "}
+        (see its{" "}
+        <a href={MODEL_DATA.primary_source.methodology} target="_blank" rel="noopener noreferrer" style={{ color: C.accent }}>
+          methodology
+        </a>
+        ). This field moves fast — treat every figure as perishable and verify before citing.
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {filtered.map(m => (
@@ -1300,18 +1307,123 @@ function ModelCards() {
             </div>
             <div style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6, marginBottom: showBenchmarks ? 12 : 0 }}>{m.strengths}</div>
             {showBenchmarks && (
-              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, animation: "fadeIn 0.3s ease" }}>
-                {[["MMLU", m.mmlu], ["HumanEval", m.humaneval], ["MATH", m.math]].map(([label, val]) => (
-                  <div key={label} style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 11, color: C.textDim, fontWeight: 700 }}>{label}</div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: m.color, marginTop: 2 }}>{val}</div>
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 12, animation: "fadeIn 0.3s ease" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: C.textDim, fontWeight: 700 }}>ARTIFICIAL ANALYSIS INTELLIGENCE INDEX</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: m.aaIndex == null ? C.textDim : m.color, marginTop: 2 }}>
+                    {m.aaIndex == null ? "—" : m.aaIndex}
                   </div>
-                ))}
-                <div style={{ gridColumn: "1/-1", fontSize: 11, color: C.textDim, textAlign: "center", marginTop: 4 }}>Scores are approximate (public reports)</div>
+                  {m.aaIndex == null && (
+                    <div style={{ fontSize: 11, color: C.textDim, marginTop: 2 }}>no sourced figure</div>
+                  )}
+                </div>
+                {m.note && (
+                  <div style={{ fontSize: 11, color: C.amber, textAlign: "center", marginTop: 8, lineHeight: 1.4 }}>{m.note}</div>
+                )}
               </div>
             )}
           </Card>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// Companion section to the paper "Using AI Safely and Ethically in Research"
+// (Johnston, 2026). This tool covers mechanism; the paper covers governance.
+// Keep the two consistent — if you change guidance here, change it there too.
+const PAPER = {
+  title: "Using AI Safely and Ethically in Research",
+  subtitle: "A Practical Guide to the Large Language Model Landscape for Research Colleagues",
+  author: "Barry Johnston, Atlantic Technological University",
+  version: "Version 1.0, July 2026",
+  doi: null,           // <-- insert the Zenodo DOI once minted, e.g. "10.5281/zenodo.XXXXXXX"
+  url: null,           // <-- or a direct link to the PDF
+};
+
+function SafeUsePanel() {
+  const { C } = useTheme();
+
+  const routes = [
+    { name: "Web interface", sub: "browser chat", risk: "LOWER RISK", color: C.teal,
+      sees: "Only what you paste or upload",
+      note: "Simplest and most forgiving. But convenience encourages careless pasting of sensitive material." },
+    { name: "Desktop app", sub: "installed program", risk: "MEDIUM", color: C.amber,
+      sees: "A folder you explicitly grant",
+      note: "Read permission prompts rather than clicking through them. Installing locally does not make processing local." },
+    { name: "Command line", sub: "CLI / agent", risk: "HIGHER RISK", color: C.coral,
+      sees: "A whole project, and can run commands",
+      note: "Most capable and most dangerous. Work in isolated folders, keep version control, review actions before approving." },
+  ];
+
+  const principles = [
+    { k: "Protect confidential data", v: "Never put personal, unpublished or confidential material into a public tool. Use an approved institutional service — or run an open-weight model locally so nothing leaves your hardware." },
+    { k: "Verify everything", v: "Models produce plausible text, not verified text. Treat every fact, quotation, statistic and citation as unchecked until confirmed against a primary source. Fabricated references are a well-documented failure mode." },
+    { k: "Disclose and cite", v: "Most journals and funders now require disclosure of AI use, and are near-unanimous that a tool cannot be an author. APA and MLA both publish citation formats." },
+    { k: "Stay accountable", v: "You are responsible for anything carrying your name. Use AI to assist your judgement, never to replace it." },
+    { k: "Mind reproducibility", v: "Hosted models change underneath you. Record the model, version and date; pin an open-weight model where an analysis must be repeatable." },
+    { k: "Check local policy first", v: "Institutional, funder and national rules (GDPR in particular) override any general guidance — including this page." },
+  ];
+
+  return (
+    <div style={{ textAlign: "left" }}>
+      {/* the data boundary — the core idea */}
+      <div style={{ background: C.surfaceAlt, border: `1px solid ${C.border}`, borderLeft: `3px solid ${C.accent}`, borderRadius: 12, padding: 24, marginBottom: 32 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: C.accent, marginBottom: 8 }}>THE ONE IDEA THAT MATTERS</div>
+        <div style={{ fontSize: 16, color: C.textMuted, lineHeight: 1.65 }}>
+          Everything you send to a hosted model <strong style={{ color: C.text }}>crosses a boundary</strong> onto someone else&rsquo;s servers,
+          where it is governed by their terms and may be retained. The route you choose determines how much of your
+          machine the model can see — and installing software locally does <strong style={{ color: C.text }}>not</strong> keep your data
+          local. Only running a model on your own hardware does that.
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginBottom: 32 }}>
+        {routes.map(r => (
+          <Card key={r.name} color={r.color} title={r.name} subtitle={r.sub}>
+            <div style={{ marginBottom: 12 }}><Tag color={r.color}>{r.risk}</Tag></div>
+            <div style={{ fontSize: 13, color: C.textDim, marginBottom: 8 }}>
+              <span style={{ color: C.textMuted, fontWeight: 700 }}>Can see:</span> {r.sees}
+            </div>
+            <div style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6 }}>{r.note}</div>
+          </Card>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 14, marginBottom: 32 }}>
+        {principles.map((p, i) => (
+          <div key={p.k} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10, padding: 18 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: C.accent }}>{String(i + 1).padStart(2, "0")}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: C.text }}>{p.k}</span>
+            </div>
+            <div style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.6 }}>{p.v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* companion paper */}
+      <div style={{ background: C.accent + "10", border: `1px solid ${C.accent}40`, borderRadius: 12, padding: 24 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", color: C.accent, marginBottom: 10 }}>COMPANION PAPER</div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: C.text, marginBottom: 4 }}>{PAPER.title}</div>
+        <div style={{ fontSize: 14, color: C.textMuted, marginBottom: 10, lineHeight: 1.5 }}>{PAPER.subtitle}</div>
+        <div style={{ fontSize: 13, color: C.textDim, marginBottom: 14 }}>{PAPER.author} · {PAPER.version}</div>
+        <div style={{ fontSize: 14, color: C.textMuted, lineHeight: 1.65, marginBottom: 14 }}>
+          This page is a summary. The paper covers the governance side in full — access routes and their trade-offs,
+          data protection, verification, disclosure and citation, intellectual property, environmental cost, and a
+          safe-use checklist. It is written for colleagues without a computing background. This tool covers the
+          mechanism; the paper covers the responsible use of it.
+        </div>
+        {PAPER.doi ? (
+          <a href={`https://doi.org/${PAPER.doi}`} target="_blank" rel="noopener noreferrer"
+             style={{ display: "inline-block", background: C.accent, color: "#fff", padding: "10px 20px", borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: "none" }}>
+            Read the paper — doi.org/{PAPER.doi}
+          </a>
+        ) : (
+          <div style={{ fontSize: 13, color: C.textDim, fontStyle: "italic" }}>
+            DOI pending deposit — add it to the <code style={{ background: C.surfaceAlt, padding: "1px 5px", borderRadius: 3 }}>PAPER</code> constant in App.jsx once minted.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1710,7 +1822,7 @@ function AppContent() {
             An interactive reference covering architectures, model types, <Term word="embeddings" match="Embedding" />, alignment techniques, and the practical landscape of modern LLMs. Hover dotted words for definitions.
           </p>
           <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
-            {[{ l: "9 sections", c: C.accent }, { l: "Interactive diagrams", c: C.purple }, { l: "10-question quiz", c: C.amber }, { l: "Searchable glossary", c: C.teal }].map(b => <Badge key={b.l} color={b.c}>{b.l}</Badge>)}
+            {[{ l: "10 sections", c: C.accent }, { l: "Interactive diagrams", c: C.purple }, { l: "10-question quiz", c: C.amber }, { l: "Searchable glossary", c: C.teal }].map(b => <Badge key={b.l} color={b.c}>{b.l}</Badge>)}
           </div>
         </section>
 
@@ -1742,8 +1854,8 @@ function AppContent() {
               { title: "Instruction-tuned / chat", sub: "SFT + alignment transforms the base model into a helpful assistant that follows instructions safely.", color: C.purple, tags: ["Claude", "ChatGPT"] },
               { title: "Embedding models", sub: "Convert text to dense vectors for similarity search, clustering, and RAG retrieval. Not generative.", color: C.teal, tags: ["text-embedding-3", "Voyage"] },
               { title: "Code-specialised", sub: "Pretrained or fine-tuned on source code. Understand syntax, semantics, and idioms across languages.", color: C.blue, tags: ["Code Llama", "StarCoder 2", "DeepSeek-Coder"] },
-              { title: "Multimodal", sub: "Accept and/or generate across modalities — text, images, audio, video, structured data.", color: C.coral, tags: ["GPT-4o", "Gemini", "Claude vision"] },
-              { title: "Mixture-of-Experts (MoE)", sub: "Many expert sub-networks, only a subset activated per token. Large capacity, lower inference cost.", color: C.amber, tags: ["DeepSeek-V3", "Mixtral"] },
+              { title: "Multimodal", sub: "Accept and/or generate across modalities — text, images, audio, video, structured data.", color: C.coral, tags: ["GPT-5.6", "Gemini", "Claude"] },
+              { title: "Mixture-of-Experts (MoE)", sub: "Many expert sub-networks, only a subset activated per token. Large capacity, lower inference cost.", color: C.amber, tags: ["GLM-5.2", "Kimi K3", "Mixtral"] },
             ].map(c => <Card key={c.title} color={c.color} title={c.title} subtitle={c.sub}><div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{c.tags.map(t => <Tag key={t} color={c.color}>{t}</Tag>)}</div></Card>)}
           </div>
           <MoEDemo />
@@ -1782,8 +1894,13 @@ function AppContent() {
         </section>
 
         <section id="landscape" className="section">
-          <SectionTitle sub="Filter and explore models across the capability spectrum. Toggle benchmarks to compare MMLU, HumanEval, and MATH scores (approximate).">Model landscape</SectionTitle>
+          <SectionTitle sub="Filter and explore models across the capability spectrum. Toggle benchmarks to see the Artificial Analysis Intelligence Index where a sourced figure is available.">Model landscape</SectionTitle>
           <ModelCards />
+        </section>
+
+        <section id="safe-use" className="section">
+          <SectionTitle sub="Knowing how these systems work is only half of it. This section covers using them responsibly in research — what leaves your control, and what you remain accountable for.">Safe &amp; ethical use</SectionTitle>
+          <SafeUsePanel />
         </section>
 
         <section id="quiz" className="section">
