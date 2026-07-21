@@ -1,5 +1,8 @@
 # LLM Taxonomy Guide
 
+[![DOI](https://zenodo.org/badge/1226361483.svg)](https://zenodo.org/badge/latestdoi/1226361483)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 An interactive reference for large language models — architectures, tokenisation, attention,
 embeddings, alignment, retrieval-augmented generation, and the current model landscape.
 
