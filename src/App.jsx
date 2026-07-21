@@ -1337,7 +1337,7 @@ const PAPER = {
   subtitle: "A Practical Guide to the Large Language Model Landscape for Research Colleagues",
   author: "Barry Johnston, Atlantic Technological University",
   version: "Version 1.0, July 2026",
-  doi: null,           // <-- insert the Zenodo DOI once minted, e.g. "10.5281/zenodo.XXXXXXX"
+  doi: "10.5281/zenodo.21462031",   // paper's Zenodo DOI (string — must be quoted)
   url: null,           // <-- or a direct link to the PDF
 };
 
