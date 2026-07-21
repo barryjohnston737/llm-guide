@@ -20,9 +20,11 @@ pipeline), a ten-question quiz, and a searchable glossary.
 This tool covers **mechanism** — how the models work. Its companion paper covers
 **governance** — how to use them responsibly in research:
 
-> **Using AI Safely and Ethically in Research: A Practical Guide to the Large Language Model
-> Landscape for Research Colleagues.** Barry Johnston, Atlantic Technological University,
-> Version 1.0, July 2026. *(DOI pending deposit.)*
+[![Paper DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21462031.svg)](https://doi.org/10.5281/zenodo.21462031)
+
+> Johnston, B., & Moran, J. (2026). *Using AI Safely and Ethically in Research: A Practical Guide
+> to the Large Language Model Landscape for Research Colleagues.* Version 1.0. Atlantic
+> Technological University. https://doi.org/10.5281/zenodo.21462031
 
 The paper addresses access routes and their trade-offs, data protection, verification,
 disclosure and citation, intellectual property, and environmental cost. The two are designed
@@ -81,7 +83,16 @@ during development. Treat every figure as perishable.
 
 ## Citation
 
-If you use this software, please cite it using the metadata in [`CITATION.cff`](CITATION.cff).
+If you use this software, please cite it using the metadata in [`CITATION.cff`](CITATION.cff), or:
+
+> Johnston, B. (2026). *LLM Taxonomy Guide: an interactive reference for large language models*
+> (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.21468988
+
+The DOI above is the *concept* DOI and always resolves to the latest release. To cite the exact
+version you used, take the version DOI from that release's Zenodo record.
+
+If you are citing the guidance rather than the software, cite the companion paper instead
+(https://doi.org/10.5281/zenodo.21462031).
 
 ## Licence
 
