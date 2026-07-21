@@ -11,7 +11,7 @@ authors:
   - given-names: James
     family-names: Moran
     affiliation: Atlantic Technological University
-    # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"   # <-- add if available
+    orcid: "https://orcid.org/0000-0002-2845-4325"
 repository-code: "https://github.com/barryjohnston737/llm-guide"
 url: "https://llm-guide-uil6.vercel.app/"
 abstract: >-
@@ -43,8 +43,10 @@ references:
       - given-names: Barry
         family-names: Johnston
         affiliation: Atlantic Technological University
+        orcid: "https://orcid.org/0000-0002-5287-2287"
       - given-names: James
         family-names: Moran
         affiliation: Atlantic Technological University
+        orcid: "https://orcid.org/0000-0002-2845-4325"
     year: 2026
     doi: 10.5281/zenodo.21462031

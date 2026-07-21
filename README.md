@@ -96,7 +96,7 @@ If you are citing the guidance rather than the software, cite the companion pape
 
 ## Licence
 
-[MIT](LICENSE) © 2026 Barry Johnston, Atlantic Technological University.
+[MIT](LICENSE) © 2026 Barry Johnston and James Moran, Atlantic Technological University.
 
 ## Built with
 
