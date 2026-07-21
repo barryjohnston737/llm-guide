@@ -85,8 +85,8 @@ during development. Treat every figure as perishable.
 
 If you use this software, please cite it using the metadata in [`CITATION.cff`](CITATION.cff), or:
 
-> Johnston, B. (2026). *LLM Taxonomy Guide: an interactive reference for large language models*
-> (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.21468988
+> Johnston, B., & Moran, J. (2026). *LLM Taxonomy Guide: an interactive reference for large
+> language models* (Version 1.0.0) [Computer software]. https://doi.org/10.5281/zenodo.21468988
 
 The DOI above is the *concept* DOI and always resolves to the latest release. To cite the exact
 version you used, take the version DOI from that release's Zenodo record.
